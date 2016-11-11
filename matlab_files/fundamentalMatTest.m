@@ -20,7 +20,8 @@ matchedPoints2 = valid_points2(matches(:,2),:);
 figure; showMatchedFeatures(im1,im2,matchedPoints1,matchedPoints2);
 
 %% fundamental matrix
-F = estimateFundamentalMatrix(matchedPoints1, matchedPoints2);
+%F = estimateFundamentalMatrix(matchedPoints1, matchedPoints2);
+H = findHomography(matchedPoints1, matchedPoints2);
 
 %% relative pose
-pose = relativeCameraPose(F); %can't run this on mine? :P
+%pose = relativeCameraPose(F); %can't run this on mine? :P
