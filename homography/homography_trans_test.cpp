@@ -5,6 +5,7 @@
 # include "opencv2/nonfree/features2d.hpp"
 
 #include <iostream>
+#include <vector>
 
 using namespace cv;
 
@@ -85,13 +86,29 @@ int main( int argc, char** argv )
     scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
   }
 
-  Mat H = findHomography( obj, scene, CV_RANSAC );
-
   Mat K = (Mat_<double>(3,3) << 800, 0, 320, 0, 800, 240, 0, 0, 1);
+
+  Mat H = findHomography( obj, scene, CV_RANSAC );
+  Mat F = findFundamentalMat(obj, scene);
+
+  Mat w;
+  SVD::compute(F, w);
+  std::cout << w << std::endl;
+
+  Mat E = K.t() * F * K;
+  Mat u, vt;
+  SVD::compute(E, w, u, vt);
+  w.at<double>(0,0) = ( w.at<double>(0,0) + w.at<double>(1,0) ) / 2.0;
+  w.at<double>(1,0) = ( w.at<double>(0,0) + w.at<double>(1,0) ) / 2.0;
+  w.at<double>(2,0) = 0.0;
+  Mat w_ = (Mat_<double>(3,3) << w.at<double>(0,0), 0, 0, 0, w.at<double>(1,0), 0, 0, 0, w.at<double>(2,0));
+
+  E = u * w_ * vt;
+  SVD::compute(E, w, u, vt);
 
   Mat T2 = K.inv() * H.inv() * K;
 
-  std::cout << T2 << std::endl;
+  std::cout << "E: " << E << std::endl;
 
   //-- Get the corners from the image_1 ( the object to be "detected" )
   std::vector<Point2f> obj_corners(4);
