@@ -4,6 +4,8 @@
 # include "opencv2/calib3d/calib3d.hpp"
 # include "opencv2/nonfree/features2d.hpp"
 
+#include <iostream>
+
 using namespace cv;
 
 void readme();
@@ -84,6 +86,12 @@ int main( int argc, char** argv )
   }
 
   Mat H = findHomography( obj, scene, CV_RANSAC );
+
+  Mat K = (Mat_<double>(3,3) << 800, 0, 320, 0, 800, 240, 0, 0, 1);
+
+  Mat T2 = K.inv() * H.inv() * K;
+
+  std::cout << T2 << std::endl;
 
   //-- Get the corners from the image_1 ( the object to be "detected" )
   std::vector<Point2f> obj_corners(4);
