@@ -128,8 +128,21 @@ int main( int argc, char** argv )
     hconcat(R2, t2, T2);
     Mat M1 = K*T1;
     Mat M2 = K*T2;
-    Mat pt;
-    triangulatePoints(M1, M2, obj[0], scene[0], pt);
+    cv::Mat pt(1,4,CV_64FC4);
+    cv::Mat cam0pts(1,3,CV_64FC2);
+    cam0pts.at<float>(0,0) = obj[0].x;
+    cam0pts.at<float>(0,1) = obj[0].y;
+    cam0pts.at<float>(0,2) = 1;
+    cv::Mat cam1pts(1,3,CV_64FC2);
+    cam1pts.at<float>(0,0) = scene[0].x;
+    cam1pts.at<float>(0,1) = scene[0].y;
+    cam1pts.at<float>(0,2) = 1;
+    triangulatePoints(M1, M2, cam0pts, cam1pts, pt);
+
+    std::cout << "X: " << pt.at<float>(0,0)/pt.at<float>(0,3) << ", ";
+    std::cout << "Y: " << pt.at<float>(0,1)/pt.at<float>(0,3) << ", ";
+    std::cout << "Z: " << pt.at<float>(0,2)/pt.at<float>(0,3) << ", ";
+    std::cout << "1: " << pt.at<float>(0,3)/pt.at<float>(0,3) << std::endl;
   }
 
   //-- Get the corners from the image_1 ( the object to be "detected" )
