@@ -89,6 +89,9 @@ int main( int argc, char** argv )
   Mat K = (Mat_<double>(3,3) << 800, 0, 320, 0, 800, 240, 0, 0, 1);
 
   Mat H = findHomography( obj, scene, CV_RANSAC );
+  Mat T2 = K.inv() * H.inv() * K;
+
+
   Mat F = findFundamentalMat(obj, scene);
 
   Mat w;
@@ -105,10 +108,16 @@ int main( int argc, char** argv )
 
   E = u * w_ * vt;
   SVD::compute(E, w, u, vt);
-
-  Mat T2 = K.inv() * H.inv() * K;
+  w_ = (Mat_<double>(3,3) << w.at<double>(0,0), 0, 0, 0, w.at<double>(1,0), 0, 0, 0, w.at<double>(2,0));
 
   std::cout << "E: " << E << std::endl;
+
+  //extract all four possible translations and rotations
+  vector<Mat> p_r, p_t;
+  p_r.push_back(u*w_*vt);     p_t.push_back(u.col(2));
+  p_r.push_back(u*w_*vt);     p_t.push_back(u.col(2));
+  p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
+  p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
 
   //-- Get the corners from the image_1 ( the object to be "detected" )
   std::vector<Point2f> obj_corners(4);
