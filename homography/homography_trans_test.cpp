@@ -119,6 +119,19 @@ int main( int argc, char** argv )
   p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
   p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
 
+  for(int i = 0; i < 4; i++)
+  {
+    Mat t1 = (Mat_<double>(3,1) << 0, 0, 0); Mat R1 = Mat::eye(3, 3, CV_64F);
+    Mat t2 = p_t[i]; Mat R2 = p_r[i];
+    Mat T1, T2;
+    hconcat(R1, t1, T1); 
+    hconcat(R2, t2, T2);
+    Mat M1 = K*T1;
+    Mat M2 = K*T2;
+    Mat pt;
+    triangulatePoints(M1, M2, obj[0], scene[0], pt);
+  }
+
   //-- Get the corners from the image_1 ( the object to be "detected" )
   std::vector<Point2f> obj_corners(4);
   obj_corners[0] = Point(0,0); obj_corners[1] = Point( img_object.cols, 0 );
