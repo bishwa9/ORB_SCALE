@@ -106,7 +106,7 @@ int main( int argc, char** argv )
   std::cout << "w\n" << w << std::endl;
   std::cout << "vt\n" << vt << std::endl;
 
-  w.at<double>(0,0) = ( w.at<double>(0,0) + w.at<double>(1,0) ) / 2.0;
+  w.at<double>(0,0) = 1.0;
   w.at<double>(1,0) = w.at<double>(0,0);
   w.at<double>(2,0) = 0.0;
   Mat w_ = (Mat_<double>(3,3) << w.at<double>(0,0), 0, 0, 0, w.at<double>(1,0), 0, 0, 0, w.at<double>(2,0));
@@ -119,7 +119,7 @@ int main( int argc, char** argv )
 
   E = u * w_ * vt;
   SVD::compute(E, w, u, vt);
-  w_ = (Mat_<double>(3,3) << w.at<double>(0,0), 0, 0, 0, w.at<double>(1,0), 0, 0, 0, w.at<double>(2,0));
+  w_ = (Mat_<double>(3,3) << 0, -1.0, 0, 1.0, 0, 0, 0, 0, 1.0);
   std::cout << "AFTER:\n";
   std::cout << "E\n" << E << std::endl;
   std::cout << "u\n" << u << std::endl;
@@ -127,11 +127,13 @@ int main( int argc, char** argv )
   std::cout << "vt\n" << vt << std::endl;
 
   //extract all four possible translations and rotations
+  Mat v = vt.t();
   vector<Mat> p_r, p_t;
   p_r.push_back(u*w_*vt);     p_t.push_back(u.col(2));
-  p_r.push_back(u*w_*vt);     p_t.push_back(u.col(2));
+  p_r.push_back(u*w_*vt);     p_t.push_back(-1*u.col(2));
+  p_r.push_back(u*w_.t()*vt); p_t.push_back(u.col(2));
   p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
-  p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
+  std::cout << u.col(2) << std::endl;
 
   for(int i = 0; i < 4; i++)
   {
@@ -142,29 +144,31 @@ int main( int argc, char** argv )
     hconcat(R2, t2, T2);
     Mat M1 = K*T1;
     Mat M2 = K*T2;
-    cv::Mat pt(1,4,CV_64FC4);
-    cv::Mat cam0pts(1,3,CV_64FC2);
-    cam0pts.at<float>(0,0) = obj[0].x;
-    cam0pts.at<float>(0,1) = obj[0].y;
-    cam0pts.at<float>(0,2) = 1;
-    cv::Mat cam1pts(1,3,CV_64FC2);
-    cam1pts.at<float>(0,0) = scene[0].x;
-    cam1pts.at<float>(0,1) = scene[0].y;
-    cam1pts.at<float>(0,2) = 1;
+    cv::Mat pt = Mat::zeros(4,1,CV_64F);
+    cv::Mat cam0pts = Mat::zeros(2,1,CV_64F);
+    cam0pts.at<double>(0,0) = obj[0].x;
+    cam0pts.at<double>(1,0) = obj[0].y;
+    cv::Mat cam1pts = Mat::zeros(2,1,CV_64F);
+    cam1pts.at<double>(0,0) = scene[0].x;
+    cam1pts.at<double>(1,0) = scene[0].y;
+
+    std::cout << std::endl;
+    //std::cout << "CAM0\n" << cam0pts << std::endl;
+    //std::cout << "CAM1\n" << cam1pts << std::endl;
+
     triangulatePoints(M1, M2, cam0pts, cam1pts, pt);
 
-    std::cout << "R1\n" << R1 << "\nR2\n" << R2 << std::endl; 
+    pt.at<double>(0,0) = pt.at<double>(0,0)/pt.at<double>(3,0);
+    pt.at<double>(0,0) = pt.at<double>(1,0)/pt.at<double>(3,0);
+    pt.at<double>(2,0) = pt.at<double>(2,0)/pt.at<double>(3,0);
+    pt.at<double>(3,0) = pt.at<double>(3,0)/pt.at<double>(3,0);
 
-    std::cout << "X_1: " << pt.at<float>(0,0)/pt.at<float>(0,3) << ", ";
-    std::cout << "Y_1: " << pt.at<float>(0,1)/pt.at<float>(0,3) << ", ";
-    std::cout << "Z_1: " << pt.at<float>(0,2)/pt.at<float>(0,3) << ", ";
-    std::cout << "1_1: " << pt.at<float>(0,3)/pt.at<float>(0,3) << std::endl;
-
+    Mat vert_ = (Mat_<double>(1,4) << 0, 0, 0, 1);
+    vconcat(T2, vert_, T2);
     Mat pt_2 = T2 * pt;
-    std::cout << "X_2: " << pt_2.at<float>(0,0)/pt_2.at<float>(0,3) << ", ";
-    std::cout << "Y_2: " << pt_2.at<float>(0,1)/pt_2.at<float>(0,3) << ", ";
-    std::cout << "Z_2: " << pt_2.at<float>(0,2)/pt_2.at<float>(0,3) << ", ";
-    std::cout << "1_2: " << pt_2.at<float>(0,3)/pt_2.at<float>(0,3) << std::endl << std::endl;
+    std::cout << "T2\n" << T2 << std::endl;
+    std::cout << "Pt1\n" << pt << std::endl; 
+    std::cout << "Pt2\n" << T2 * pt << std::endl; 
   }
   //-- Get the corners from the image_1 ( the object to be "detected" )
   std::vector<Point2f> obj_corners(4);
