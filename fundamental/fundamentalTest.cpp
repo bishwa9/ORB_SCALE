@@ -58,8 +58,8 @@ int main( int argc, char** argv )
     if( dist > max_dist ) max_dist = dist;
   }
 
-  printf("-- Max dist : %f \n", max_dist );
-  printf("-- Min dist : %f \n", min_dist );
+  /*printf("-- Max dist : %f \n", max_dist );
+  printf("-- Min dist : %f \n", min_dist );*/
 
   //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
   std::vector< DMatch > good_matches;
@@ -93,47 +93,61 @@ int main( int argc, char** argv )
   Mat w;
   SVD::compute(F, w);
 
-  std::cout << "F\n" << F << std::endl;
-  std::cout << w << std::endl;
+  /*std::cout << "F\n" << F << std::endl;
+  std::cout << w << std::endl;*/
 
   Mat E = K.t() * F * K;
   Mat u, vt;
   SVD::compute(E, w, u, vt);
 
-  std::cout << "BEFORE:\n";
+  /*std::cout << "BEFORE:\n";
   std::cout << "E\n" << E << std::endl;
   std::cout << "u\n" << u << std::endl;
   std::cout << "w\n" << w << std::endl;
-  std::cout << "vt\n" << vt << std::endl;
+  std::cout << "vt\n" << vt << std::endl;*/
 
-  w.at<double>(0,0) = 1.0;
+  w.at<double>(0,0) = ( w.at<double>(0,0) + w.at<double>(1,0) ) / 2.0;
   w.at<double>(1,0) = w.at<double>(0,0);
   w.at<double>(2,0) = 0.0;
   Mat w_ = (Mat_<double>(3,3) << w.at<double>(0,0), 0, 0, 0, w.at<double>(1,0), 0, 0, 0, w.at<double>(2,0));
 
-  std::cout << "BEFORE_2:\n";
+  /*std::cout << "BEFORE_2:\n";
   std::cout << "E\n" << E << std::endl;
   std::cout << "u\n" << u << std::endl;
   std::cout << "w\n" << w_ << std::endl;
-  std::cout << "vt\n" << vt << std::endl;
+  std::cout << "vt\n" << vt << std::endl;*/
 
   E = u * w_ * vt;
   SVD::compute(E, w, u, vt);
   w_ = (Mat_<double>(3,3) << 0, -1.0, 0, 1.0, 0, 0, 0, 0, 1.0);
-  std::cout << "AFTER:\n";
+  /*std::cout << "AFTER:\n";
   std::cout << "E\n" << E << std::endl;
   std::cout << "u\n" << u << std::endl;
   std::cout << "w\n" << w_ << std::endl;
-  std::cout << "vt\n" << vt << std::endl;
+  std::cout << "vt\n" << vt << std::endl;*/
+
+  if( determinant(u * w_ * vt) < 0 )
+  {
+    w_ = -1.0 * w_;
+  }
+
+  double minVal; 
+  double maxVal; 
+  Point minLoc; 
+  Point maxLoc;
+
+  Mat u_last = abs( u.col(2) );
+  minMaxLoc( u_last, &minVal, &maxVal, &minLoc, &maxLoc );
+  maxVal = 1.0;
 
   //extract all four possible translations and rotations
-  Mat v = vt.t();
   vector<Mat> p_r, p_t;
-  p_r.push_back(u*w_*vt);     p_t.push_back(u.col(2));
-  p_r.push_back(u*w_*vt);     p_t.push_back(-1*u.col(2));
-  p_r.push_back(u*w_.t()*vt); p_t.push_back(u.col(2));
-  p_r.push_back(u*w_.t()*vt); p_t.push_back(-1*u.col(2));
-  std::cout << u.col(2) << std::endl;
+  p_r.push_back(u*w_*vt);     p_t.push_back( u.col(2)/maxVal );
+  p_r.push_back(u*w_*vt);     p_t.push_back( (-1*u.col(2))/maxVal );
+  p_r.push_back(u*w_.t()*vt); p_t.push_back( u.col(2)/maxVal );
+  p_r.push_back(u*w_.t()*vt); p_t.push_back( (-1*u.col(2))/maxVal );
+
+  Mat R_true, t_true;
 
   for(int i = 0; i < 4; i++)
   {
@@ -152,7 +166,7 @@ int main( int argc, char** argv )
     cam1pts.at<double>(0,0) = scene[0].x;
     cam1pts.at<double>(1,0) = scene[0].y;
 
-    std::cout << std::endl;
+    //std::cout << std::endl;
     //std::cout << "CAM0\n" << cam0pts << std::endl;
     //std::cout << "CAM1\n" << cam1pts << std::endl;
 
@@ -166,10 +180,29 @@ int main( int argc, char** argv )
     Mat vert_ = (Mat_<double>(1,4) << 0, 0, 0, 1);
     vconcat(T2, vert_, T2);
     Mat pt_2 = T2 * pt;
-    std::cout << "T2\n" << T2 << std::endl;
-    std::cout << "Pt1\n" << pt << std::endl; 
-    std::cout << "Pt2\n" << T2 * pt << std::endl; 
+    std::cout << std::endl;
+    /*std::cout << "Pt1\n" << pt << std::endl; 
+    std::cout << "Pt2\n" << pt_2 << std::endl;*/
+
+    std::cout << "R2\n" << R2 << std::endl;
+    std::cout << "t2\n" << t2 << std::endl;
+    std::cout << "T\n" << T2 << std::endl;
+
+    /*if(pt.at<double>(2,0) >= 0.0 && pt_2.at<double>(2,0) >= 0.0)
+    {
+      std::cout << "FOUND!" << std::endl;
+
+      std::cout << "Pt1\n" << pt << std::endl; 
+      std::cout << "Pt2\n" << pt_2 << std::endl;
+
+      R_true = R2;
+      t_true = t2;
+
+      std::cout << "R2\n" << R_true << std::endl;
+      std::cout << "T2\n" << t_true << std::endl;
+    }*/
   }
+  /*
   //-- Get the corners from the image_1 ( the object to be "detected" )
   std::vector<Point2f> obj_corners(4);
   obj_corners[0] = Point(0,0); obj_corners[1] = Point( img_object.cols, 0 );
@@ -190,7 +223,10 @@ int main( int argc, char** argv )
   imshow( "Good Matches & Object detection", img_matches );
 
   waitKey(0);
-
+  */
+  imshow("Img1", img_object);
+  imshow("Img2", img_scene);
+  waitKey(0);
   return 0;
 }
 
