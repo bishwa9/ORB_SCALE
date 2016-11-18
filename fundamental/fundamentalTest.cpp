@@ -106,7 +106,7 @@ int main( int argc, char** argv )
   std::cout << "w\n" << w << std::endl;
   std::cout << "vt\n" << vt << std::endl;*/
 
-  w.at<double>(0,0) = ( w.at<double>(0,0) + w.at<double>(1,0) ) / 2.0;
+  w.at<double>(0,0) = 1.0; //( w.at<double>(0,0) + w.at<double>(1,0) ) / 2.0;
   w.at<double>(1,0) = w.at<double>(0,0);
   w.at<double>(2,0) = 0.0;
   Mat w_ = (Mat_<double>(3,3) << w.at<double>(0,0), 0, 0, 0, w.at<double>(1,0), 0, 0, 0, w.at<double>(2,0));
