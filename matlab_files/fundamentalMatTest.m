@@ -54,8 +54,20 @@ T2s(:,:,3) = [U*W'*V',U(:,3)./max(abs(U(:,3)))];
 T2s(:,:,4) = [U*W'*V',-U(:,3)./max(abs(U(:,3)))];
 
 %% Visualize the correct one
+figure; hold on; ylim([-10,10]);
 for i = 1:4
-    figure; hold on; axis([-2,2,-2,2,-2,2]);
-    plotCamera('Location',T1s(:,4,i)','Orientation',T1s(1:3,1:3,i),'Color',[1,0,0],'Label','1');
-    plotCamera('Location',T2s(:,4,i)','Orientation',T2s(1:3,1:3,i),'Color',[0,1,0],'Label','2');
+    
+    M1 = K * [T1s(1:3,1:3,i), T1s(:,4,i)];
+    M2 = K * [T2s(1:3,1:3,i), T2s(:,4,i)];
+    [P, error] = triangulate(M1, matchedPoints1.Location, M2, matchedPoints2.Location); 
+    P1 = [reshape(P, [3,size(P,3)]); ones(1, size(P,3))];
+    T = [T2s(:,:,i);0,0,0,1];
+    P2 = T * P1;
+    
+    %if sum(P1(3,:) >= 0) == 0 && sum(P2(3,:) >= 0) == 0
+        figure; hold on; axis([-10,10,-10,10,-10,10]);
+        plotCamera('Location',T1s(:,4,i)','Orientation',T1s(1:3,1:3,i),'Color',[1,0,0],'Label','1');
+        plotCamera('Location',T2s(:,4,i)','Orientation',T2s(1:3,1:3,i),'Color',[0,1,0],'Label','2');
+        scatter3(P(1,1,:), P(2,1,:), P(3,1,:));
+    %end
 end
