@@ -55,6 +55,7 @@ T2s(:,:,4) = [U*W'*V',-U(:,3)./max(abs(U(:,3)))];
 
 %% Visualize the correct one
 figure; hold on; ylim([-10,10]);
+index = -1;
 for i = 1:4
     
     M1 = K * [T1s(1:3,1:3,i), T1s(:,4,i)];
@@ -63,11 +64,14 @@ for i = 1:4
     P1 = [reshape(P, [3,size(P,3)]); ones(1, size(P,3))];
     T = [T2s(:,:,i);0,0,0,1];
     P2 = T * P1;
+    % Homogenize P2
+    P2 = bsxfun (@rdivide, P2, P2(4,:));
     
-    %if sum(P1(3,:) >= 0) == 0 && sum(P2(3,:) >= 0) == 0
+    if sum(P1(3,:) < 0) == 0 && sum(P2(3,:) < 0)
+        index = i;
         figure; hold on; axis([-10,10,-10,10,-10,10]);
         plotCamera('Location',T1s(:,4,i)','Orientation',T1s(1:3,1:3,i),'Color',[1,0,0],'Label','1');
         plotCamera('Location',T2s(:,4,i)','Orientation',T2s(1:3,1:3,i),'Color',[0,1,0],'Label','2');
         scatter3(P(1,1,:), P(2,1,:), P(3,1,:));
-    %end
+    end
 end
