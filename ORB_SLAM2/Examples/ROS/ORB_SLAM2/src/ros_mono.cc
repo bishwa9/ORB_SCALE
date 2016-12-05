@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nodeHandler;
     ros::Subscriber sub_height = nodeHandler.subscribe("/height", 1, &ImageGrabber::GrabHeight, &igb);
-    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    ros::Subscriber sub = nodeHandler.subscribe("/camera/rgb/image_mono", 1, &ImageGrabber::GrabImage,&igb);
 
     ros::spin();
 

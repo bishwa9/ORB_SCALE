@@ -22,3 +22,12 @@ export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:`pwd`
 cd ORB_SLAM2/
 roslaunch launch/orb_scale.launch
 ```
+
+## Visualization of trajectories using rviz
+```
+cd ORB_SLAM2/Examples/ROS/
+export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:`pwd`
+cd ORB_SLAM2/
+roslaunch launch/visualize_trajectories.launch traj_mono:=<mono_trajectory_file.txt> traj_mono_scaled:=<mono_scaled_trajectory_file.txt> traj_rgbd:=<rgbd_trajectory_file.txt>
+```
+-- Rviz displays: Green-Monocular. Red-Monocular,Scaled. Blue-RGBD

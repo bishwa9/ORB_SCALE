@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="ORB_SLAM2" type="RGBD" name="orb_slam_rgbd" output="screen" args="$(find ORB_SLAM2)/../../../Vocabulary/ORBvoc.txt $(find ORB_SLAM2)/../../RGB-D/TUM1.yaml" />
+
+  <node pkg="rosbag" type="play" name="player" output="screen" args="$(find ORB_SLAM2)/../../../data/2016-11-16-21-15-51.bag"/>
+   
+</launch>

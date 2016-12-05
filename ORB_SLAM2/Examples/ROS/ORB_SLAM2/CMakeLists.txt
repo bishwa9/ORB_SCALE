@@ -68,12 +68,11 @@ ${LIBS}
 # ${LIBS}
 # )
 # 
-# # Node for RGB-D camera
-# rosbuild_add_executable(RGBD
-# src/ros_rgbd.cc
-# )
-# 
-# target_link_libraries(RGBD
-# ${LIBS}
-# )
+# Node for RGB-D camera
+rosbuild_add_executable(RGBD
+src/ros_rgbd.cc
+)
 
+target_link_libraries(RGBD
+${LIBS}
+)

@@ -5,3 +5,4 @@ ORB_SLAM2/Examples/ROS/ORB_SLAM2/build/*
 ORB_SLAM2/Thirdparty/*/build/*
 ORB_SLAM2/data/*
 ORB_SLAM2/Vocabulary/ORBvoc.txt
+ORB_SLAM2/lib/libORB_SLAM2.so

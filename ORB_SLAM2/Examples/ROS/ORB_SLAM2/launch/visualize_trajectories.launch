@@ -1,0 +1,14 @@
+<launch>
+  
+  <arg name="traj_mono" default="$(find ORB_SLAM2)/result/trajectories/trajectories_scaleless.txt" />
+  <arg name="traj_mono_scaled" default="$(find ORB_SLAM2)/result/trajectories/trajectories_mono_scaled.txt" />
+  <arg name="traj_rgbd" default="$(find ORB_SLAM2)/result/trajectories/trajectory_rgbd.txt" />
+
+  <node pkg="ORB_SLAM2" type="visualize_trajectory.py" name="visualize_mono" output="screen" args="/orb_slam/mono $(arg traj_mono)" />
+
+  <node pkg="ORB_SLAM2" type="visualize_trajectory.py" name="visualize_mono_scaled" output="screen" args="/orb_slam/mono_scaled $(arg traj_mono_scaled)" />
+
+  <node pkg="ORB_SLAM2" type="visualize_trajectory.py" name="visualize_rgbd" output="screen" args="/orb_slam/rgbd $(arg traj_rgbd)" />
+   
+  <node pkg="rviz" type='rviz' name="rviz" args="$(find ORB_SLAM2)/launch/visualize_trajectories.rviz" />
+</launch>
