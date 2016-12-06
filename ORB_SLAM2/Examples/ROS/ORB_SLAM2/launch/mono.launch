@@ -1,6 +1,6 @@
 <launch>
   <node pkg="ORB_SLAM2" type="Mono" name="orb_slam" output="screen" args="$(find ORB_SLAM2)/../../../Vocabulary/ORBvoc.txt $(find ORB_SLAM2)/../../Monocular/TUM1.yaml" />
 
-  <node pkg="rosbag" type="play" name="player" output="screen" args="$(find ORB_SLAM2)/../../../data/2016-11-16-21-15-51.bag /sharp1:=/height"/>
+  <node pkg="rosbag" type="play" name="player" output="screen" args="$(find ORB_SLAM2)/../../../data/subset2.bag"/>
    
 </launch>

@@ -13,6 +13,7 @@ pub = rospy.Publisher(sys.argv[1], PoseArray, queue_size=10)
 
 rospy.init_node('orb_slam_'+sys.argv[1].split('/')[-1])
 
+disp_factor = 10
 
 ## Get the data from the file
 def read_data(filename):
@@ -36,9 +37,9 @@ def publish_sequence(data, pub):
         pose_msg.header.stamp = rospy.Time.from_sec(d[0])
         pose_msg.header.frame_id = 'map'
         # Position
-        pose_msg.pose.position.x = d[1]
-        pose_msg.pose.position.y = d[2]
-        pose_msg.pose.position.z = d[3]
+        pose_msg.pose.position.x = d[1]*disp_factor
+        pose_msg.pose.position.y = d[2]*disp_factor
+        pose_msg.pose.position.z = d[3]*disp_factor
         # Orientation
         pose_msg.pose.orientation.x = d[4]
         pose_msg.pose.orientation.y = d[5]
@@ -65,9 +66,9 @@ def publish_pose_array_msg(data, pub):
         for d in data:
             pose = Pose()
             # Position
-            pose.position.x = d[1]
-            pose.position.y = d[2]
-            pose.position.z = d[3]
+            pose.position.x = d[1]*disp_factor
+            pose.position.y = d[2]*disp_factor
+            pose.position.z = d[3]*disp_factor
             # Orientation
             pose.orientation.x = d[4]
             pose.orientation.y = d[5]

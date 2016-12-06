@@ -522,7 +522,8 @@ bool Initializer::ReconstructF(vector<bool> &vbMatchesInliers, cv::Mat &F21, cv:
         nsimilar++;
 
     // If there is not a clear winner or not enough triangulated points reject initialization
-    if(maxGood<nMinGood || nsimilar>1)
+    // if(maxGood<nMinGood || nsimilar>1)
+    if(maxGood<nMinGood || nsimilar>1 || dHeight<40)
     {
         return false;
     }
@@ -603,7 +604,8 @@ bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv:
     float d2 = w.at<float>(1);
     float d3 = w.at<float>(2);
 
-    if(d1/d2<1.00001 || d2/d3<1.00001)
+    // if(d1/d2<1.00001 || d2/d3<1.00001)
+    if(d1/d2<1.00001 || d2/d3<1.00001 || dHeight<40)
     {
         return false;
     }
